@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频测试</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border: 2px solid #fff;
+            margin: 20px 0;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .info {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>视频播放测试</h1>
+    
+    <div class="info">
+        <h3>测试1: 基本视频播放</h3>
+        <div class="video-container">
+            <video controls>
+                <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                您的浏览器不支持视频播放。
+            </video>
+        </div>
+    </div>
+    
+    <div class="info">
+        <h3>测试2: 自动播放静音循环</h3>
+        <div class="video-container">
+            <video autoplay muted loop>
+                <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                您的浏览器不支持视频播放。
+            </video>
+        </div>
+    </div>
+    
+    <div class="info">
+        <h3>测试3: 全屏背景视频</h3>
+        <div style="position: relative; width: 100%; height: 300px; overflow: hidden;">
+            <video autoplay muted loop style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                您的浏览器不支持视频播放。
+            </video>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px;">
+                <h2>这是覆盖在视频上的内容</h2>
+                <p>如果你能看到这个文字和背景视频，说明视频播放正常</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 检查视频加载状态
+        document.querySelectorAll('video').forEach((video, index) => {
+            video.addEventListener('loadstart', () => {
+                console.log(`视频 ${index + 1} 开始加载`);
+            });
+            
+            video.addEventListener('canplay', () => {
+                console.log(`视频 ${index + 1} 可以播放`);
+            });
+            
+            video.addEventListener('playing', () => {
+                console.log(`视频 ${index + 1} 正在播放`);
+            });
+            
+            video.addEventListener('error', (e) => {
+                console.error(`视频 ${index + 1} 加载错误:`, e);
+            });
+        });
+    </script>
+</body>
+</html>

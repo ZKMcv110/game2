@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频调试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #ffe6e6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            color: #d00;
+        }
+        .success {
+            background: #e6ffe6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            color: #080;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>视频播放调试页面</h1>
+        
+        <div class="info">
+            <h3>浏览器支持检测</h3>
+            <p id="browser-support">检测中...</p>
+        </div>
+        
+        <div class="info">
+            <h3>视频文件信息</h3>
+            <p>文件路径: images/6680dea1e89dc334112a6e56a0f928d3.mp4</p>
+            <p>文件大小: 940KB</p>
+            <p>文件格式: MP4</p>
+        </div>
+        
+        <h3>测试1: 基础视频播放</h3>
+        <video id="video1" controls preload="metadata">
+            <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+        </video>
+        <div id="video1-status" class="info">等待测试...</div>
+        
+        <h3>测试2: 带多种格式的视频</h3>
+        <video id="video2" controls preload="metadata">
+            <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4; codecs='avc1.42E01E, mp4a.40.2'">
+            <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+        </video>
+        <div id="video2-status" class="info">等待测试...</div>
+        
+        <h3>测试3: 手动播放控制</h3>
+        <video id="video3" controls preload="none" muted>
+            <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+        </video>
+        <br>
+        <button onclick="playVideo3()">播放视频</button>
+        <button onclick="pauseVideo3()">暂停视频</button>
+        <button onclick="reloadVideo3()">重新加载</button>
+        <div id="video3-status" class="info">等待测试...</div>
+        
+        <h3>网络请求测试</h3>
+        <button onclick="testVideoUrl()">测试视频URL访问</button>
+        <div id="url-test-result" class="info">等待测试...</div>
+        
+        <h3>错误日志</h3>
+        <div id="error-log" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        // 检测浏览器支持
+        function checkBrowserSupport() {
+            const video = document.createElement('video');
+            const support = {
+                mp4: video.canPlayType('video/mp4'),
+                webm: video.canPlayType('video/webm'),
+                ogg: video.canPlayType('video/ogg')
+            };
+            
+            let supportText = '';
+            for (const [format, canPlay] of Object.entries(support)) {
+                supportText += `${format.toUpperCase()}: ${canPlay || '不支持'}<br>`;
+            }
+            
+            document.getElementById('browser-support').innerHTML = supportText;
+        }
+        
+        // 视频事件监听
+        function setupVideoListeners(videoId, statusId) {
+            const video = document.getElementById(videoId);
+            const status = document.getElementById(statusId);
+            
+            video.addEventListener('loadstart', () => {
+                status.innerHTML = '开始加载视频...';
+                status.className = 'info';
+            });
+            
+            video.addEventListener('loadedmetadata', () => {
+                status.innerHTML = `视频元数据加载成功<br>时长: ${video.duration.toFixed(2)}秒<br>尺寸: ${video.videoWidth}x${video.videoHeight}`;
+                status.className = 'success';
+            });
+            
+            video.addEventListener('loadeddata', () => {
+                status.innerHTML += '<br>视频数据加载完成';
+            });
+            
+            video.addEventListener('canplay', () => {
+                status.innerHTML += '<br>视频可以播放';
+            });
+            
+            video.addEventListener('error', (e) => {
+                const error = video.error;
+                let errorMsg = '视频加载错误: ';
+                switch(error.code) {
+                    case 1: errorMsg += 'MEDIA_ERR_ABORTED - 用户中止'; break;
+                    case 2: errorMsg += 'MEDIA_ERR_NETWORK - 网络错误'; break;
+                    case 3: errorMsg += 'MEDIA_ERR_DECODE - 解码错误'; break;
+                    case 4: errorMsg += 'MEDIA_ERR_SRC_NOT_SUPPORTED - 格式不支持'; break;
+                    default: errorMsg += '未知错误';
+                }
+                status.innerHTML = errorMsg;
+                status.className = 'error';
+                
+                // 显示错误日志
+                const errorLog = document.getElementById('error-log');
+                errorLog.style.display = 'block';
+                errorLog.innerHTML += `${videoId}: ${errorMsg}<br>`;
+            });
+        }
+        
+        // 手动控制视频3
+        function playVideo3() {
+            const video = document.getElementById('video3');
+            video.play().then(() => {
+                document.getElementById('video3-status').innerHTML = '视频播放中...';
+                document.getElementById('video3-status').className = 'success';
+            }).catch(e => {
+                document.getElementById('video3-status').innerHTML = '播放失败: ' + e.message;
+                document.getElementById('video3-status').className = 'error';
+            });
+        }
+        
+        function pauseVideo3() {
+            const video = document.getElementById('video3');
+            video.pause();
+            document.getElementById('video3-status').innerHTML = '视频已暂停';
+            document.getElementById('video3-status').className = 'info';
+        }
+        
+        function reloadVideo3() {
+            const video = document.getElementById('video3');
+            video.load();
+            document.getElementById('video3-status').innerHTML = '视频重新加载中...';
+            document.getElementById('video3-status').className = 'info';
+        }
+        
+        // 测试视频URL访问
+        function testVideoUrl() {
+            const url = 'images/6680dea1e89dc334112a6e56a0f928d3.mp4';
+            const resultDiv = document.getElementById('url-test-result');
+            
+            fetch(url, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        resultDiv.innerHTML = `URL访问成功<br>状态码: ${response.status}<br>Content-Type: ${response.headers.get('content-type') || '未设置'}`;
+                        resultDiv.className = 'success';
+                    } else {
+                        resultDiv.innerHTML = `URL访问失败<br>状态码: ${response.status}`;
+                        resultDiv.className = 'error';
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `网络请求失败: ${error.message}`;
+                    resultDiv.className = 'error';
+                });
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBrowserSupport();
+            setupVideoListeners('video1', 'video1-status');
+            setupVideoListeners('video2', 'video2-status');
+            setupVideoListeners('video3', 'video3-status');
+        });
+    </script>
+</body>
+</html>

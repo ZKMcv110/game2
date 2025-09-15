@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>焗瓷修复大师 - 传统工艺修复游戏</title>
+    <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+    <!-- 主菜单界面 -->
+    <div id="main-menu" class="screen active">
+        <div class="sky-background"></div>
+        <div class="menu-content">
+            <h1 class="game-title">焗瓷修复大师</h1>
+            <p class="game-subtitle">Traditional Porcelain Restoration</p>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="startGame()">开始修复</button>
+                <button class="menu-btn" onclick="showGallery()">作品展览</button>
+                <button class="menu-btn" onclick="showTutorial()">工艺教程</button>
+                <button class="menu-btn" onclick="showVideoGallery()">视频展示</button>
+                <button class="menu-btn" onclick="showSettings()">游戏设置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏主界面 -->
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <button class="back-btn" onclick="backToMenu()">返回主菜单</button>
+            <h2 id="step-title">第一步：捧匣与启封</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+                <span class="progress-text" id="progress-text">1/8</span>
+            </div>
+        </div>
+        
+        <!-- 步骤1：捧匣与启封 -->
+        <div id="step1" class="step-screen">
+            <!-- 步骤介绍页面 -->
+            <div class="step-intro" id="step1-intro">
+                <video class="intro-video" autoplay muted loop preload="auto">
+                    <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放。
+                </video>
+                <div class="intro-overlay">
+                    <div class="intro-content">
+                        <h3>第一步：捧匣与启封</h3>
+                        <p class="intro-description">
+                            接收委托，了解器物背后的故事，建立情感连接。<br>
+                            一个古朴的木匣被送到你的工作台，里面静静地躺着破碎的瓷片和一封委托信。
+                        </p>
+                        <button class="start-step-btn" onclick="startStep1()">开始修复</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤内容 -->
+            <div class="step-content hidden" id="step1-content">
+                <div class="story-container">
+                    <div class="wooden-box" id="wooden-box">
+                        <div class="box-lock" id="box-lock">
+                            <div class="lock-mechanism"></div>
+                        </div>
+                        <div class="box-content hidden" id="box-content">
+                            <div class="broken-pieces"></div>
+                            <div class="letter-envelope" id="letter" onclick="openLetter()">
+                                <div class="envelope-seal"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="story-text hidden" id="story-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤2：洗净与归位 -->
+        <div id="step2" class="step-screen">
+            <!-- 步骤介绍页面 -->
+            <div class="step-intro" id="step2-intro">
+                <video class="intro-video" autoplay muted loop preload="auto">
+                    <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放。
+                </video>
+                <div class="intro-overlay">
+                    <div class="intro-content">
+                        <h3>第二步：洗净与归位</h3>
+                        <p class="intro-description">
+                            清理碎片，并像玩3D拼图一样将器物复原。<br>
+                            先用毛刷清除污渍，再用清水冲洗，最后拖拽拼合。
+                        </p>
+                        <button class="start-step-btn" onclick="startStep2()">开始修复</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤内容 -->
+            <div class="step-content hidden" id="step2-content">
+                <div class="cleaning-workspace">
+                    <div class="tool-panel">
+                        <h4>清洗工具</h4>
+                        <button class="tool-btn active" data-tool="brush">🖌️ 毛刷</button>
+                        <button class="tool-btn" data-tool="water">💧 清水</button>
+                    </div>
+                    <div class="pieces-container" id="pieces-container"></div>
+                    <div class="assembly-area" id="assembly-area">
+                        <p>将清洗好的碎片拖拽到这里拼合</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤3：找碴与定点 -->
+        <div id="step3" class="step-screen">
+            <!-- 步骤介绍页面 -->
+            <div class="step-intro" id="step3-intro">
+                <video class="intro-video" autoplay muted loop>
+                    <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                </video>
+                <div class="intro-overlay">
+                    <div class="intro-content">
+                        <h3>第三步：找碴与定点</h3>
+                        <p class="intro-description">
+                            沿着裂缝，为之后打孔的"锔钉"精确定位。<br>
+                            用墨斗在裂缝两侧标记出需要钻孔的点。
+                        </p>
+                        <button class="start-step-btn" onclick="startStep3()">开始修复</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤内容 -->
+            <div class="step-content hidden" id="step3-content">
+                <div class="marking-workspace">
+                    <div class="tool-panel">
+                        <h4>标记工具</h4>
+                        <div class="tool-btn active">🖋️ 墨斗</div>
+                    </div>
+                    <canvas id="marking-canvas" width="400" height="300"></canvas>
+                    <p class="instruction">在裂缝两侧点击标记钻孔位置</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤4：牵钻与引孔 -->
+        <div id="step4" class="step-screen">
+            <!-- 步骤介绍页面 -->
+            <div class="step-intro" id="step4-intro">
+                <video class="intro-video" autoplay muted loop>
+                    <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                </video>
+                <div class="intro-overlay">
+                    <div class="intro-content">
+                        <h3>第四步：牵钻与引孔</h3>
+                        <p class="intro-description">
+                            使用传统的"手拉弓钻"在标记点上钻孔。<br>
+                            按住拖拽来模拟拉弓动作，需要持续操作才能完成钻孔。
+                        </p>
+                        <button class="start-step-btn" onclick="startStep4()">开始修复</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤内容 -->
+            <div class="step-content hidden" id="step4-content">
+                <div class="drilling-workspace">
+                    <div class="bow-drill" id="bow-drill">
+                        <div class="drill-string"></div>
+                        <div class="drill-bit"></div>
+                    </div>
+                    <div class="drilling-target" id="drilling-target">
+                        <p class="instruction">按住拖拽来操作弓钻，在标记点钻孔</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤5：锻钉与塑形 -->
+        <div id="step5" class="step-screen">
+            <!-- 步骤介绍页面 -->
+            <div class="step-intro" id="step5-intro">
+                <video class="intro-video" autoplay muted loop>
+                    <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                </video>
+                <div class="intro-overlay">
+                    <div class="intro-content">
+                        <h3>第五步：锻钉与塑形</h3>
+                        <p class="intro-description">
+                            根据孔洞的距离和器物的弧度，亲手锻造出合适的"锔钉"。<br>
+                            每个锻造点需要多次敲击才能完成塑形。
+                        </p>
+                        <button class="start-step-btn" onclick="startStep5()">开始修复</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤内容 -->
+            <div class="step-content hidden" id="step5-content">
+                <div class="forging-workspace">
+                    <div class="anvil-area">
+                        <div class="metal-strip" id="metal-strip"></div>
+                        <p class="instruction">点击锻造点进行敲击塑形</p>
+                    </div>
+                    <div class="hammer" id="hammer">🔨</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤6：落锤与扣合 -->
+        <div id="step6" class="step-screen">
+            <!-- 步骤介绍页面 -->
+            <div class="step-intro" id="step6-intro">
+                <video class="intro-video" autoplay muted loop>
+                    <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                </video>
+                <div class="intro-overlay">
+                    <div class="intro-content">
+                        <h3>第六步：落锤与扣合</h3>
+                        <p class="intro-description">
+                            将锻造好的锔钉安装到器物上，完成物理固定。<br>
+                            用小锤子精准地敲击锔钉的两端，将其牢牢固定。
+                        </p>
+                        <button class="start-step-btn" onclick="startStep6()">开始修复</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤内容 -->
+            <div class="step-content hidden" id="step6-content">
+                <div class="installation-workspace">
+                    <div class="vessel-with-holes" id="vessel-holes">
+                        <p class="instruction">点击安装锔钉到孔洞中</p>
+                    </div>
+                    <div class="staples-inventory" id="staples-inventory">
+                        <h4>锔钉库存</h4>
+                    </div>
+                    <div class="install-hammer" id="install-hammer">🔨</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤7：调浆与弥缝 -->
+        <div id="step7" class="step-screen">
+            <!-- 步骤介绍页面 -->
+            <div class="step-intro" id="step7-intro">
+                <video class="intro-video" autoplay muted loop>
+                    <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                </video>
+                <div class="intro-overlay">
+                    <div class="intro-content">
+                        <h3>第七步：调浆与弥缝</h3>
+                        <p class="intro-description">
+                            用传统材料或金缮工艺填补最后的缝隙，完成艺术升华。<br>
+                            调制金漆，用细毛笔沿着裂缝描绘，赋予伤痕美感。
+                        </p>
+                        <button class="start-step-btn" onclick="startStep7()">开始修复</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤内容 -->
+            <div class="step-content hidden" id="step7-content">
+                <div class="kintsugi-workspace">
+                    <div class="mixing-area">
+                        <h4>调制金漆</h4>
+                        <div class="ingredients">
+                            <div class="ingredient" data-ingredient="lacquer">天然漆</div>
+                            <div class="ingredient" data-ingredient="gold">金粉</div>
+                            <div class="ingredient" data-ingredient="silver">银粉</div>
+                        </div>
+                        <div class="mixing-bowl" id="mixing-bowl"></div>
+                    </div>
+                    <canvas id="kintsugi-canvas" width="400" height="300"></canvas>
+                    <p class="instruction">先调制金漆，然后沿着裂缝描绘</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤8：拂尘与归还 -->
+        <div id="step8" class="step-screen">
+            <!-- 步骤介绍页面 -->
+            <div class="step-intro" id="step8-intro">
+                <video class="intro-video" autoplay muted loop>
+                    <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                </video>
+                <div class="intro-overlay">
+                    <div class="intro-content">
+                        <h3>第八步：拂尘与归还</h3>
+                        <p class="intro-description">
+                            做最后的清理和抛光，完整地欣赏自己的杰作。<br>
+                            用软布仔细抛光每个区域，让器物重现光泽。
+                        </p>
+                        <button class="start-step-btn" onclick="startStep8()">开始修复</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤内容 -->
+            <div class="step-content hidden" id="step8-content">
+                <div class="polishing-workspace">
+                    <div class="completed-vessel" id="completed-vessel"></div>
+                    <div class="polishing-area"></div>
+                    <p class="instruction">按住拖拽来抛光各个区域</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最终展示 -->
+        <div id="final-presentation" class="final-screen">
+            <div class="presentation-content">
+                <h2>修复完成！</h2>
+                <div class="step-summary"></div>
+                <div class="artifact-preview">
+                    <div class="gallery-grid">
+                        <div class="gallery-item">
+                            <h4>修复前</h4>
+                            <div class="artifact-image" style="background-image: url('images/repaired.jpg')"></div>
+                        </div>
+                        <div class="gallery-item">
+                            <h4>修复后</h4>
+                            <div class="artifact-image" style="background-image: url('images/damaged.jpg')"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="thank-you-letter"></div>
+                <div class="completion-photo"></div>
+                <button class="menu-btn" onclick="backToMenu()">返回主菜单</button>
+            </div>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="step-controls">
+            <button id="prev-btn" class="control-btn" onclick="gameState.previousStep()">上一步</button>
+            <button id="complete-btn" class="control-btn" onclick="gameState.nextStep()" style="display: none;">完成此步骤</button>
+            <button id="next-btn" class="control-btn" onclick="gameState.nextStep()">下一步</button>
+        </div>
+
+        <!-- 消息提示 -->
+        <div id="message-container" class="message-container"></div>
+    </div>
+
+    <!-- 作品展览界面 -->
+    <div id="gallery-screen" class="screen">
+        <div class="sky-background"></div>
+        <div class="gallery-content">
+            <h2>作品展览</h2>
+            <button class="back-btn" onclick="backToMenu()">返回主菜单</button>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <div class="artifact-image" style="background-image: url('images/repaired.jpg')"></div>
+                    <h3>青花瓷茶碗</h3>
+                    <p>修复时间：2024年春</p>
+                    <p>工艺：传统锔瓷 + 金缮</p>
+                </div>
+                <div class="gallery-item">
+                    <div class="artifact-image" style="background-image: url('images/damaged.jpg')"></div>
+                    <h3>白瓷花瓶</h3>
+                    <p>修复时间：2024年夏</p>
+                    <p>工艺：锔瓷修复</p>
+                </div>
+                <div class="gallery-item">
+                    <div class="artifact-image" style="background-image: url('images/background.jpg')"></div>
+                    <h3>青瓷盘</h3>
+                    <p>修复时间：2024年秋</p>
+                    <p>工艺：金缮工艺</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工艺教程界面 -->
+    <div id="tutorial-screen" class="screen">
+        <div class="sky-background"></div>
+        <div class="tutorial-content">
+            <h2>焗瓷工艺教程</h2>
+            <button class="back-btn" onclick="backToMenu()">返回主菜单</button>
+            <div class="tutorial-sections">
+                <div class="tutorial-section">
+                    <h3>什么是焗瓷？</h3>
+                    <p>焗瓷是中国传统的瓷器修复工艺，通过锔钉将破碎的瓷器重新固定，不仅恢复功能，更赋予器物新的美感。</p>
+                </div>
+                <div class="tutorial-section">
+                    <h3>工艺流程</h3>
+                    <ol>
+                        <li><strong>捧匣与启封</strong> - 了解器物故事，建立情感连接</li>
+                        <li><strong>洗净与归位</strong> - 清洗碎片，拼合复原</li>
+                        <li><strong>找碴与定点</strong> - 精确标记钻孔位置</li>
+                        <li><strong>牵钻与引孔</strong> - 手拉弓钻，节奏钻孔</li>
+                        <li><strong>锻钉与塑形</strong> - 锻造锔钉，火花四溅</li>
+                        <li><strong>落锤与扣合</strong> - 安装锔钉，固定裂缝</li>
+                        <li><strong>调浆与弥缝</strong> - 金缮工艺，艺术升华</li>
+                        <li><strong>拂尘与归还</strong> - 抛光完成，重现光泽</li>
+                    </ol>
+                </div>
+                <div class="tutorial-section">
+                    <h3>传统工具</h3>
+                    <ul>
+                        <li><strong>手拉弓钻</strong> - 传统钻孔工具，需要双手配合操作</li>
+                        <li><strong>小锤</strong> - 用于锻造锔钉和安装固定</li>
+                        <li><strong>墨斗</strong> - 标记钻孔位置的精密工具</li>
+                        <li><strong>毛笔</strong> - 用于金缮工艺的细致描绘</li>
+                    </ul>
+                </div>
+                <div class="tutorial-section">
+                    <h3>文化意义</h3>
+                    <p>焗瓷工艺体现了中国人"物尽其用"的生活智慧，以及"化腐朽为神奇"的艺术追求。破碎不是终结，而是新生的开始。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏设置界面 -->
+    <div id="settings-screen" class="screen">
+        <div class="sky-background"></div>
+        <div class="settings-content">
+            <h2>游戏设置</h2>
+            <button class="back-btn" onclick="backToMenu()">返回主菜单</button>
+            <div class="settings-sections">
+                <div class="setting-item">
+                    <h3>音效设置</h3>
+                    <div class="setting-controls">
+                        <label class="switch">
+                            <input type="checkbox" id="sound-toggle" checked onchange="toggleSound()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>启用音效</span>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <h3>背景音乐</h3>
+                    <div class="setting-controls">
+                        <label class="switch">
+                            <input type="checkbox" id="music-toggle" checked onchange="toggleBackgroundMusic()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>启用背景音乐</span>
+                    </div>
+                    <div class="setting-controls">
+                        <span>音量：</span>
+                        <input type="range" id="music-volume" min="0" max="100" value="40" onchange="changeMusicVolume()">
+                        <span id="volume-display">40%</span>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <h3>游戏难度</h3>
+                    <div class="setting-controls">
+                        <select id="difficulty-select" onchange="changeDifficulty()">
+                            <option value="easy">简单</option>
+                            <option value="normal" selected>普通</option>
+                            <option value="hard">困难</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <h3>显示提示</h3>
+                    <div class="setting-controls">
+                        <label class="switch">
+                            <input type="checkbox" id="hints-toggle" checked onchange="toggleHints()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>显示操作提示</span>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <h3>关于游戏</h3>
+                    <p>焗瓷修复大师 v1.0</p>
+                    <p>传承中华传统工艺，体验匠人精神</p>
+                    <p>© 2024 传统工艺游戏工作室</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 视频展示界面 -->
+    <div id="video-gallery-screen" class="screen">
+        <div class="sky-background"></div>
+        <div class="video-gallery-content">
+            <h2>工艺视频展示</h2>
+            <button class="back-btn" onclick="backToMenu()">返回主菜单</button>
+            
+            <div class="video-gallery-grid">
+                <div class="video-item">
+                    <div class="video-thumbnail" onclick="playVideo('video1')">
+                        <img src="images/background.jpg" alt="焗瓷工艺视频">
+                        <div class="play-overlay">
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="video-info">
+                            <h3>传统焗瓷工艺全程</h3>
+                            <p>完整展示焗瓷修复的八个步骤</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="video-item">
+                    <div class="video-thumbnail" onclick="playVideo('video2')">
+                        <img src="images/damaged.jpg" alt="瓷器修复技法">
+                        <div class="play-overlay">
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="video-info">
+                            <h3>瓷器修复技法详解</h3>
+                            <p>专业师傅演示修复技巧</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="video-item">
+                    <div class="video-thumbnail" onclick="playVideo('video3')">
+                        <img src="images/repaired.jpg" alt="金缮工艺展示">
+                        <div class="play-overlay">
+                            <div class="play-button">▶</div>
+                        </div>
+                        <div class="video-info">
+                            <h3>金缮工艺展示</h3>
+                            <p>用黄金修复破碎的美</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 视频播放器模态框 -->
+    <div id="video-modal" class="video-modal">
+        <div class="video-modal-content">
+            <span class="video-close" onclick="closeVideo()">&times;</span>
+            <video id="modal-video" controls>
+                <source src="images/6680dea1e89dc334112a6e56a0f928d3.mp4" type="video/mp4">
+                您的浏览器不支持视频播放。
+            </video>
+            <div class="video-description">
+                <h3 id="video-title">视频标题</h3>
+                <p id="video-desc">视频描述</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 音效元素 -->
+    <div class="audio-elements">
+        <div id="click-sound"></div>
+        <div id="unlock-sound"></div>
+        <div id="brush-sound"></div>
+        <div id="drill-sound"></div>
+        <div id="hammer-sound"></div>
+    </div>
+
+    <!-- 音乐控制器 -->
+    <div id="music-controller" class="music-controller">
+        <button id="music-play-pause" class="music-btn" onclick="toggleMusicPlayPause()">🎵</button>
+        <div class="volume-control">
+            <button class="volume-btn" onclick="toggleMute()">🔊</button>
+            <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="40" onchange="adjustVolume()">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
