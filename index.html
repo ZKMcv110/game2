@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>焗瓷修复大师 - 传统工艺修复游戏</title>
-    <link rel="stylesheet" href="styles.css?v=2">
+    <title>锯瓷修复大师 - 传统工艺修复游戏</title>
+    <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
     <!-- 主菜单界面 -->
     <div id="main-menu" class="screen active">
         <div class="sky-background"></div>
         <div class="menu-content">
-            <h1 class="game-title">焗瓷修复大师</h1>
+            <h1 class="game-title">锯瓷修复大师</h1>
             <p class="game-subtitle">Traditional Porcelain Restoration</p>
             <div class="menu-buttons">
                 <button class="menu-btn" onclick="startGame()">开始修复</button>
-                <button class="menu-btn" onclick="showGallery()">作品展览</button>
                 <button class="menu-btn" onclick="showTutorial()">工艺教程</button>
                 <button class="menu-btn" onclick="showVideoGallery()">视频展示</button>
                 <button class="menu-btn" onclick="showSettings()">游戏设置</button>
@@ -26,7 +25,10 @@
     <!-- 游戏主界面 -->
     <div id="game-screen" class="screen">
         <div class="game-header">
-            <button class="back-btn" onclick="backToMenu()">返回主菜单</button>
+            <div class="header-left">
+                <button class="back-btn" onclick="backToMenu()">返回主菜单</button>
+                <button class="restart-btn" onclick="restartGame()">重新开始</button>
+            </div>
             <h2 id="step-title">第一步：捧匣与启封</h2>
             <div class="progress-container">
                 <div class="progress-bar">
@@ -87,8 +89,8 @@
                     <div class="intro-content">
                         <h3>第二步：洗净与归位</h3>
                         <p class="intro-description">
-                            清理碎片，并像玩3D拼图一样将器物复原。<br>
-                            先用毛刷清除污渍，再用清水冲洗，最后拖拽拼合。
+                            清洗有裂缝的器物，去除表面污垢和杂质。<br>
+                            先用毛刷刷除污渍，再用清水冲洗干净。
                         </p>
                         <button class="start-step-btn" onclick="startStep2()">开始修复</button>
                     </div>
@@ -105,7 +107,7 @@
                     </div>
                     <div class="pieces-container" id="pieces-container"></div>
                     <div class="assembly-area" id="assembly-area">
-                        <p>将清洗好的碎片拖拽到这里拼合</p>
+                        <p>点击器物进行清洗，清洗完成后会自动归位</p>
                     </div>
                 </div>
             </div>
@@ -143,7 +145,7 @@
             </div>
         </div>
 
-        <!-- 步骤4：牵钻与引孔 -->
+        <!-- 步骤4：锯瓷与打孔 -->
         <div id="step4" class="step-screen">
             <!-- 步骤介绍页面 -->
             <div class="step-intro" id="step4-intro">
@@ -152,7 +154,7 @@
                 </video>
                 <div class="intro-overlay">
                     <div class="intro-content">
-                        <h3>第四步：牵钻与引孔</h3>
+                        <h3>第四步：锯瓷与打孔</h3>
                         <p class="intro-description">
                             使用传统的"手拉弓钻"在标记点上钻孔。<br>
                             按住拖拽来模拟拉弓动作，需要持续操作才能完成钻孔。
@@ -272,6 +274,14 @@
                         <div class="mixing-bowl" id="mixing-bowl"></div>
                     </div>
                     <canvas id="kintsugi-canvas" width="400" height="300"></canvas>
+                    
+                    <!-- 线条粗细控制器 -->
+                    <div class="brush-controls">
+                        <label for="brush-size">笔刷粗细：</label>
+                        <input type="range" id="brush-size" min="1" max="10" value="3" step="1">
+                        <span id="brush-size-display">3px</span>
+                    </div>
+                    
                     <p class="instruction">先调制金漆，然后沿着裂缝描绘</p>
                 </div>
             </div>
@@ -373,12 +383,12 @@
     <div id="tutorial-screen" class="screen">
         <div class="sky-background"></div>
         <div class="tutorial-content">
-            <h2>焗瓷工艺教程</h2>
+            <h2>锯瓷工艺教程</h2>
             <button class="back-btn" onclick="backToMenu()">返回主菜单</button>
             <div class="tutorial-sections">
                 <div class="tutorial-section">
-                    <h3>什么是焗瓷？</h3>
-                    <p>焗瓷是中国传统的瓷器修复工艺，通过锔钉将破碎的瓷器重新固定，不仅恢复功能，更赋予器物新的美感。</p>
+                    <h3>什么是锯瓷？</h3>
+                    <p>锯瓷是中国传统的瓷器修复工艺，通过锔钉将破碎的瓷器重新固定，不仅恢复功能，更赋予器物新的美感。</p>
                 </div>
                 <div class="tutorial-section">
                     <h3>工艺流程</h3>
@@ -404,7 +414,7 @@
                 </div>
                 <div class="tutorial-section">
                     <h3>文化意义</h3>
-                    <p>焗瓷工艺体现了中国人"物尽其用"的生活智慧，以及"化腐朽为神奇"的艺术追求。破碎不是终结，而是新生的开始。</p>
+                    <p>锯瓷工艺体现了中国人"物尽其用"的生活智慧，以及"化腐朽为神奇"的艺术追求。破碎不是终结，而是新生的开始。</p>
                 </div>
             </div>
         </div>
@@ -464,7 +474,7 @@
                 </div>
                 <div class="setting-item">
                     <h3>关于游戏</h3>
-                    <p>焗瓷修复大师 v1.0</p>
+                    <p>锯瓷修复大师 v1.0</p>
                     <p>传承中华传统工艺，体验匠人精神</p>
                     <p>© 2024 传统工艺游戏工作室</p>
                 </div>
@@ -482,13 +492,13 @@
             <div class="video-gallery-grid">
                 <div class="video-item">
                     <div class="video-thumbnail" onclick="playVideo('video1')">
-                        <img src="images/background.jpg" alt="焗瓷工艺视频">
+                        <img src="images/background.jpg" alt="锯瓷工艺视频">
                         <div class="play-overlay">
                             <div class="play-button">▶</div>
                         </div>
                         <div class="video-info">
-                            <h3>传统焗瓷工艺全程</h3>
-                            <p>完整展示焗瓷修复的八个步骤</p>
+                            <h3>传统锯瓷工艺全程</h3>
+                            <p>完整展示锯瓷修复的八个步骤</p>
                         </div>
                     </div>
                 </div>
@@ -555,6 +565,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>

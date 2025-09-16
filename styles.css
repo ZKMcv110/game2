@@ -128,18 +128,34 @@ body {
     z-index: 100;
 }
 
-.back-btn {
+.header-left {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.back-btn, .restart-btn {
     padding: 10px 20px;
     background: #8B4513;
     color: #FFD700;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+    font-size: 14px;
 }
 
-.back-btn:hover {
+.back-btn:hover, .restart-btn:hover {
     background: #A0522D;
+    transform: translateY(-1px);
+}
+
+.restart-btn {
+    background: #B8860B;
+}
+
+.restart-btn:hover {
+    background: #DAA520;
 }
 
 #step-title {
@@ -470,12 +486,12 @@ body {
 }
 
 #marking-canvas {
+    width: 400px;
+    height: 300px;
     border-radius: 10px;
     border: 3px solid #8B4513;
     background: url('images/repaired.jpg') center/contain no-repeat;
     cursor: crosshair;
-    max-width: 90%;
-    max-height: 70vh;
     touch-action: manipulation;
 }
 
@@ -528,7 +544,7 @@ body {
 .drilling-target {
     width: 400px;
     height: 300px;
-    background: url('images/repaired.jpg') center/cover no-repeat;
+    background: url('images/repaired.jpg') center/contain no-repeat;
     border-radius: 10px;
     position: relative;
     border: 3px solid #8B4513;
@@ -544,16 +560,16 @@ body {
 }
 
 .anvil-area {
-    width: 500px;
+    width: 400px;
     height: 300px;
     background-image: url('images/repaired.jpg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     background-color: rgba(105, 105, 105, 0.2);
-    border-radius: 20px;
+    border-radius: 10px;
     position: relative;
-    border: 5px solid #2F4F4F;
+    border: 3px solid #8B4513;
 }
 
 .metal-strip {
@@ -572,6 +588,8 @@ body {
     font-size: 3em;
     cursor: pointer;
     transition: transform 0.2s ease;
+    touch-action: none;
+    user-select: none;
 }
 
 .hammer:hover {
@@ -581,17 +599,18 @@ body {
 /* 第六步样式 */
 .installation-workspace {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
     align-items: center;
+    gap: 30px;
     width: 100%;
     max-width: 800px;
 }
 
 .vessel-with-holes {
-    flex: 2;
+    width: 400px;
     height: 300px;
-    background: url('images/repaired.jpg') center/cover no-repeat;
-    border-radius: 15px;
+    background: url('images/repaired.jpg') center/contain no-repeat;
+    border-radius: 10px;
     position: relative;
     border: 3px solid #8B4513;
 }
@@ -625,6 +644,83 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 30px;
+}
+
+/* 笔刷控制器样式 */
+.brush-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(139, 69, 19, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 2px solid #8B4513;
+    margin: 10px 0;
+}
+
+.brush-controls label {
+    font-weight: bold;
+    color: #8B4513;
+    font-size: 14px;
+}
+
+.brush-controls input[type="range"] {
+    width: 120px;
+    height: 6px;
+    background: rgba(139, 69, 19, 0.3);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+.brush-controls input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #FFD700;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #8B4513;
+}
+
+.brush-controls input[type="range"]::-webkit-slider-thumb:hover {
+    background: #FFA500;
+    transform: scale(1.1);
+}
+
+.brush-controls input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #FFD700;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #8B4513;
+    transition: all 0.3s ease;
+}
+
+.brush-controls input[type="range"]::-moz-range-thumb:hover {
+    background: #FFA500;
+    transform: scale(1.1);
+}
+
+.brush-controls input[type="range"]::-moz-range-track {
+    height: 6px;
+    background: rgba(139, 69, 19, 0.3);
+    border-radius: 3px;
+    border: none;
+}
+
+#brush-size-display {
+    font-weight: bold;
+    color: #FFD700;
+    background: #8B4513;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    min-width: 35px;
+    text-align: center;
 }
 
 .mixing-area {
@@ -675,12 +771,12 @@ body {
 }
 
 #kintsugi-canvas {
+    width: 400px;
+    height: 300px;
     border-radius: 10px;
     border: 3px solid #8B4513;
     background: url('images/repaired.jpg') center/contain no-repeat;
     cursor: crosshair;
-    max-width: 90%;
-    max-height: 70vh;
 }
 
 /* 第八步样式 */
@@ -692,10 +788,10 @@ body {
 }
 
 .completed-vessel {
-    width: 200px;
-    height: 200px;
-    background: url('images/repaired.jpg') center/cover no-repeat;
-    border-radius: 15px;
+    width: 400px;
+    height: 300px;
+    background: url('images/repaired.jpg') center/contain no-repeat;
+    border-radius: 10px;
     transition: all 0.5s ease;
     border: 3px solid #8B4513;
 }
@@ -839,9 +935,10 @@ body {
 /* 消息提示样式 */
 .message-container {
     position: fixed;
-    top: 100px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 20px;
+    right: 50%;
+    transform: translateX(50%);
+    width: 350px;
     z-index: 1000;
     pointer-events: none;
 }
@@ -1436,6 +1533,21 @@ input:checked + .slider:before {
     outline: none;
     cursor: pointer;
     -webkit-appearance: none;
+}
+
+.setting-controls input[type="range"]::-webkit-slider-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(139, 69, 19, 0.3);
+    border-radius: 3px;
+}
+
+.setting-controls input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(139, 69, 19, 0.3);
+    border-radius: 3px;
+    border: none;
 }
 
 .setting-controls input[type="range"]::-webkit-slider-thumb {

@@ -642,10 +642,9 @@ function initCleaningStep() {
     const toolBtns = document.querySelectorAll('.tool-btn');
     
     if (piecesContainer && assemblyArea) {
-        let cleanedPieces = 0;
-        let assembledPieces = 0;
+        let isVesselCleaned = false;
         let currentTool = 'brush';
-        const totalPieces = 6;
+        let brushingComplete = false;
         
         // 工具选择
         toolBtns.forEach(btn => {
@@ -657,103 +656,213 @@ function initCleaningStep() {
             });
         });
         
-        // 创建碎片
-        for (let i = 0; i < totalPieces; i++) {
-            const piece = document.createElement('div');
-            piece.className = 'ceramic-piece';
-            piece.id = `piece-${i}`;
-            piece.style.width = '60px';
-            piece.style.height = '60px';
-            piece.style.background = 'url("images/damaged.jpg") center/cover no-repeat';
-            piece.style.borderRadius = '10px';
-            piece.style.cursor = 'pointer';
-            piece.style.filter = 'sepia(50%) brightness(0.7)';
-            piece.style.transition = 'all 0.3s ease';
-            piece.style.position = 'relative';
-            piece.draggable = false;
-            piece.dataset.brushed = 'false';
-            piece.dataset.watered = 'false';
-            piece.dataset.cleaned = 'false';
-            piece.dataset.assembled = 'false';
-            
-            // 清洗功能
-            piece.addEventListener('click', () => {
-                if (currentTool === 'brush' && piece.dataset.brushed === 'false') {
-                    gameState.playSound('brush');
-                    piece.style.filter = 'sepia(30%) brightness(0.8)';
-                    piece.dataset.brushed = 'true';
-                    showMessage('用毛刷刷掉了表面的污垢，现在用清水冲洗！');
-                } else if (currentTool === 'water' && piece.dataset.brushed === 'true' && piece.dataset.watered === 'false') {
-                    gameState.playSound('brush');
-                    piece.style.filter = 'none';
-                    piece.style.transform = 'scale(1.1)';
-                    piece.dataset.watered = 'true';
-                    piece.dataset.cleaned = 'true';
-                    piece.draggable = true;
-                    piece.style.cursor = 'grab';
-                    cleanedPieces++;
+        // 清空容器并设置初始状态
+        piecesContainer.innerHTML = '';
+        assemblyArea.innerHTML = '<p>点击器物进行清洗，清洗完成后会自动归位</p>';
+        
+        // 创建有裂缝的完整器物
+        const vessel = document.createElement('div');
+        vessel.className = 'cracked-vessel';
+        vessel.id = 'cracked-vessel';
+        vessel.dataset.cleaned = 'false';
+        vessel.style.cssText = `
+            width: 200px;
+            height: 200px;
+            background: url('images/damaged.jpg') center/cover no-repeat;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 20px auto;
+            transition: all 0.5s ease;
+            filter: sepia(80%) saturate(150%) hue-rotate(20deg) brightness(0.7);
+            border: 4px solid #8B4513;
+            box-shadow: 0 0 15px rgba(139, 69, 19, 0.5);
+            position: relative;
+        `;
+        
+        // 添加裂缝效果
+        const crackOverlay = document.createElement('div');
+        crackOverlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 40%, rgba(0,0,0,0.8) 42%, rgba(0,0,0,0.8) 44%, transparent 46%),
+                        linear-gradient(-30deg, transparent 60%, rgba(0,0,0,0.6) 62%, rgba(0,0,0,0.6) 64%, transparent 66%);
+            border-radius: 15px;
+            pointer-events: none;
+        `;
+        vessel.appendChild(crackOverlay);
+        
+        // 清洗功能 - 分两步：刷洗和冲水
+        vessel.addEventListener('click', () => {
+            if (currentTool === 'brush' && !brushingComplete) {
+                gameState.playSound('brush');
+                
+                // 刷洗效果
+                vessel.style.filter = 'sepia(40%) saturate(120%) hue-rotate(10deg) brightness(0.85)';
+                vessel.style.transform = 'scale(1.02)';
+                
+                setTimeout(() => {
+                    vessel.style.transform = 'scale(1)';
+                }, 300);
+                
+                brushingComplete = true;
+                showMessage('表面污垢已刷除！现在选择清水工具进行冲洗。');
+                
+            } else if (currentTool === 'water' && brushingComplete && !isVesselCleaned) {
+                gameState.playSound('water');
+                
+                // 清洗动画
+                vessel.style.filter = 'none';
+                vessel.style.transform = 'scale(1.05)';
+                vessel.style.boxShadow = '0 0 30px rgba(135, 206, 235, 0.8)';
+                
+                // 添加清洗水波效果
+                const waterEffect = document.createElement('div');
+                waterEffect.style.cssText = `
+                    position: absolute;
+                    top: -10px;
+                    left: -10px;
+                    right: -10px;
+                    bottom: -10px;
+                    border: 3px solid rgba(135, 206, 235, 0.6);
+                    border-radius: 20px;
+                    animation: waterRipple 1s ease-out;
+                `;
+                vessel.appendChild(waterEffect);
+                
+                setTimeout(() => {
+                    vessel.style.transform = 'scale(1)';
+                    vessel.style.boxShadow = '0 0 20px rgba(135, 206, 235, 0.5)';
+                    waterEffect.remove();
                     
+                    // 自动归位到中央区域
                     setTimeout(() => {
-                        piece.style.transform = 'scale(1)';
-                    }, 200);
+                        vessel.remove();
+                        assemblyArea.innerHTML = `
+                            <div style="
+                                width: 250px; 
+                                height: 250px; 
+                                background: url('images/damaged.jpg') center/cover no-repeat; 
+                                border-radius: 15px; 
+                                animation: glow 2s infinite;
+                                border: 3px solid #FFD700;
+                                box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+                                margin: 20px auto;
+                                position: relative;
+                            ">
+                                <div style="
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background: linear-gradient(45deg, transparent 40%, rgba(255,215,0,0.3) 42%, rgba(255,215,0,0.3) 44%, transparent 46%),
+                                                linear-gradient(-30deg, transparent 60%, rgba(255,215,0,0.2) 62%, rgba(255,215,0,0.2) 64%, transparent 66%);
+                                    border-radius: 15px;
+                                    pointer-events: none;
+                                "></div>
+                            </div>
+                        `;
+                        showMessage('器物清洗完成并已归位！裂缝清晰可见，准备进入下一步修复。');
+                        document.getElementById('complete-btn').style.display = 'inline-block';
+                    }, 800);
+                }, 500);
+                
+                isVesselCleaned = true;
+                showMessage('正在清洗器物表面...');
+                
+            } else if (currentTool === 'brush' && brushingComplete) {
+                showMessage('已经刷洗过了，请选择清水工具进行冲洗！');
+            } else if (currentTool === 'water' && !brushingComplete) {
+                showMessage('请先选择毛刷工具清除表面污垢！');
+            }
+        });
+        
+        piecesContainer.appendChild(vessel);
+        
+        // 添加清洗说明
+        const instruction = document.createElement('p');
+        instruction.style.cssText = `
+            text-align: center;
+            color: #8B4513;
+            font-size: 16px;
+            margin: 20px;
+            font-weight: bold;
+        `;
+        instruction.textContent = '先用毛刷清除污垢，再用清水冲洗';
+        piecesContainer.appendChild(instruction);
+        
+        // 原来的碎片创建代码已被移除，现在使用完整器物清洗
+    }
+    
+    // 移除旧的拖拽相关代码
+    function addDragEvents(element) {
+        if (element) {
+            element.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', element.id);
+                element.style.opacity = '0.5';
+            });
+            
+            element.addEventListener('dragend', () => {
+                element.style.opacity = '1';
+            });
+        }
+    }
+}
+
+function initMarkingStep() {
+    // 保持原有的标记步骤代码不变
+    const canvas = document.getElementById('marking-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            // 标记步骤的原有逻辑保持不变
+            let markCount = 0;
+            const maxMarks = 6;
+            const markPositions = [];
+            
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                
+                if (markCount < maxMarks) {
+                    gameState.playSound('click');
                     
-                    // 添加拖拽事件
-                    addDragEvents(piece);
+                    markPositions.push({x: x, y: y, id: markCount + 1});
                     
-                    if (cleanedPieces === totalPieces) {
-                        showMessage('所有碎片已清洗完毕！现在将它们拖拽到中央区域进行拼合。');
+                    ctx.fillStyle = '#FFD700';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = '#8B4513';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#000';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(markCount + 1, x, y + 5);
+                    
+                    markCount++;
+                    
+                    if (markCount >= maxMarks) {
+                        showMessage('标记完成！所有钻孔位置已确定。');
+                        document.getElementById('complete-btn').style.display = 'inline-block';
+                        gameState.markPositions = markPositions;
                     }
                 }
             });
-            
-            piecesContainer.appendChild(piece);
         }
-        
-        // 设置拼合区域为拖拽目标
-        assemblyArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            assemblyArea.style.background = 'rgba(255, 215, 0, 0.3)';
-        });
-        
-        assemblyArea.addEventListener('dragleave', () => {
-            assemblyArea.style.background = 'rgba(0, 0, 0, 0.5)';
-        });
-        
-        assemblyArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            assemblyArea.style.background = 'rgba(0, 0, 0, 0.5)';
-            
-            const pieceId = e.dataTransfer.getData('text/plain');
-            const piece = document.getElementById(pieceId);
-            
-            if (piece && piece.dataset.assembled === 'false') {
-                gameState.playSound('click');
-                
-                // 从原容器中移除碎片
-                if (piece.parentNode) {
-                    piece.parentNode.removeChild(piece);
-                }
-                
-                // 移动碎片到拼合区域
-                piece.style.position = 'relative';
-                piece.style.margin = '5px';
-                piece.dataset.assembled = 'true';
-                piece.draggable = false;
-                assemblyArea.appendChild(piece);
-                assembledPieces++;
-                
-                if (assembledPieces === totalPieces) {
-                    setTimeout(() => {
-                        // 显示完整的器物
-                        assemblyArea.innerHTML = '<div style="width: 200px; height: 200px; background: url(\'images/damaged.jpg\') center/cover no-repeat; border-radius: 15px; animation: glow 2s infinite;"></div>';
-                        showMessage('拼合完成！器物重现完整形态！');
-                        document.getElementById('complete-btn').style.display = 'inline-block';
-                    }, 500);
-                }
-            }
-        });
     }
 }
+
+// 清洗步骤修改完成，移除了旧的碎片代码
 
 function addDragEvents(element) {
     element.addEventListener('dragstart', (e) => {
@@ -875,8 +984,9 @@ function initDrillingStep() {
             let drillProgress = 0;
             let drillInterval = null;
             
-            // 鼠标按下开始拉弓钻孔
-            target.addEventListener('mousedown', (e) => {
+            // 添加触摸和鼠标事件支持
+            function startDrilling(e) {
+                e.preventDefault();
                 if (target.dataset.drilled === 'true') return;
                 
                 isDrilling = true;
@@ -932,10 +1042,9 @@ function initDrillingStep() {
                         }
                     }
                 }, 50);
-            });
+            }
             
-            // 鼠标松开停止拉弓
-            target.addEventListener('mouseup', () => {
+            function stopDrilling() {
                 if (drillInterval) {
                     clearInterval(drillInterval);
                 }
@@ -947,20 +1056,22 @@ function initDrillingStep() {
                     drillProgress = 0;
                     showMessage('需要持续按住拖拽来操作弓钻！');
                 }
-            });
+            }
             
-            // 鼠标离开也停止
-            target.addEventListener('mouseleave', () => {
-                if (drillInterval) {
-                    clearInterval(drillInterval);
-                }
-                isDrilling = false;
-                if (target.dataset.drilled === 'false') {
-                    target.style.animation = 'none';
-                    target.style.transform = 'scale(1)';
-                    target.style.background = '#FFD700';
-                    drillProgress = 0;
-                }
+            // 添加鼠标和触摸事件
+            target.addEventListener('mousedown', startDrilling);
+            target.addEventListener('mouseup', stopDrilling);
+            target.addEventListener('mouseleave', stopDrilling);
+            
+            // 触摸事件支持
+            target.addEventListener('touchstart', startDrilling, { passive: false });
+            target.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                stopDrilling();
+            });
+            target.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                stopDrilling();
             });
             
             drillingTarget.appendChild(target);
@@ -1193,13 +1304,13 @@ function initForgingStep() {
         
         // 添加事件监听器
         hammer.addEventListener('mousedown', startDrag);
-        hammer.addEventListener('touchstart', startDrag);
+        hammer.addEventListener('touchstart', startDrag, { passive: false });
         
         document.addEventListener('mousemove', drag);
-        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchmove', drag, { passive: false });
         
         document.addEventListener('mouseup', endDrag);
-        document.addEventListener('touchend', endDrag);
+        document.addEventListener('touchend', endDrag, { passive: false });
         
         // 初始提示
         showMessage('拖拽锤子到金属条上的锻造点进行塑形！');
@@ -1248,7 +1359,7 @@ function initInstallationStep() {
         const drilledPositions = gameState.drilledPositions || [];
         const maxInstalls = Math.max(drilledPositions.length, 3); // 使用实际钻孔数量
         
-        // 创建锔钉库存 - 根据实际需要的数量
+        // 创建锔钉库存 - 根据实际需要的数量，支持拖拽
         for (let i = 0; i < maxInstalls; i++) {
             const staple = document.createElement('div');
             staple.style.cssText = `
@@ -1257,18 +1368,31 @@ function initInstallationStep() {
                 background: linear-gradient(90deg, #CD7F32, #B87333);
                 border-radius: 10px;
                 margin: 10px auto;
-                cursor: pointer;
+                cursor: grab;
                 transition: all 0.3s ease;
+                position: relative;
+                z-index: 10;
             `;
             staple.dataset.used = 'false';
+            staple.draggable = true;
             
-            staple.addEventListener('click', () => {
+            // 拖拽开始
+            staple.addEventListener('dragstart', (e) => {
                 if (staple.dataset.used === 'false') {
                     gameState.playSound('click');
-                    staple.style.opacity = '0.5';
-                    staple.dataset.used = 'true';
-                    showMessage('锔钉已选中，点击器物上的孔洞进行安装。');
+                    staple.style.cursor = 'grabbing';
+                    staple.style.opacity = '0.8';
+                    e.dataTransfer.setData('text/plain', i); // 传递锔钉索引
+                    showMessage('拖拽锔钉到孔洞上进行安装！');
+                } else {
+                    e.preventDefault(); // 阻止已使用的锔钉被拖拽
                 }
+            });
+            
+            // 拖拽结束
+            staple.addEventListener('dragend', (e) => {
+                staple.style.cursor = 'grab';
+                staple.style.opacity = '1';
             });
             
             staplesInventory.appendChild(staple);
@@ -1313,42 +1437,66 @@ function initInstallationStep() {
             installPoint.dataset.installed = 'false';
             installPoint.innerHTML = '○';
             
-            installPoint.addEventListener('click', () => {
+            // 拖拽放置事件
+            installPoint.addEventListener('dragover', (e) => {
+                e.preventDefault(); // 允许放置
                 if (installPoint.dataset.installed === 'false') {
-                    // 检查是否有选中的锔钉
-                    const selectedStaple = staplesInventory.querySelector('[data-used="false"]');
-                    if (!selectedStaple) {
-                        showMessage('请先选择一个锔钉！');
-                        return;
-                    }
-                    
-                    gameState.playSound('hammer');
-                    
-                    // 标记锔钉为已使用
-                    selectedStaple.dataset.used = 'true';
-                    selectedStaple.style.opacity = '0.3';
-                    selectedStaple.style.transform = 'scale(0.8)';
-                    
-                    // 安装动画
                     installPoint.style.background = '#FFD700';
-                    installPoint.style.transform = 'scale(1.3)';
-                    installPoint.dataset.installed = 'true';
-                    installCount++;
+                    installPoint.style.transform = 'scale(1.2)';
+                }
+            });
+            
+            installPoint.addEventListener('dragleave', (e) => {
+                if (installPoint.dataset.installed === 'false') {
+                    installPoint.style.background = '#654321';
+                    installPoint.style.transform = 'scale(1)';
+                }
+            });
+            
+            installPoint.addEventListener('drop', (e) => {
+                e.preventDefault();
+                
+                if (installPoint.dataset.installed === 'false') {
+                    const stapleIndex = e.dataTransfer.getData('text/plain');
+                    const staple = staplesInventory.children[stapleIndex];
                     
-                    setTimeout(() => {
-                        installPoint.style.transform = 'scale(1)';
-                        installPoint.innerHTML = '⚡';
-                        installPoint.style.fontSize = '14px';
-                        installPoint.style.color = '#8B4513';
-                        showMessage(`锔钉安装完成！还需安装 ${drilledPositions.length - installCount} 个。`);
-                    }, 200);
-                    
-                    if (installCount >= drilledPositions.length) {
+                    if (staple && staple.dataset.used === 'false') {
+                        gameState.playSound('hammer');
+                        
+                        // 标记锔钉为已使用
+                        staple.dataset.used = 'true';
+                        staple.style.opacity = '0.3';
+                        staple.style.transform = 'scale(0.8)';
+                        staple.draggable = false;
+                        staple.style.cursor = 'not-allowed';
+                        
+                        // 安装动画
+                        installPoint.style.background = '#FFD700';
+                        installPoint.style.transform = 'scale(1.3)';
+                        installPoint.dataset.installed = 'true';
+                        installCount++;
+                        
                         setTimeout(() => {
-                            showMessage('所有锔钉安装完成！器物结构已加固！');
-                            document.getElementById('complete-btn').style.display = 'inline-block';
-                        }, 500);
+                            installPoint.style.transform = 'scale(1)';
+                            installPoint.innerHTML = '⚡';
+                            installPoint.style.fontSize = '14px';
+                            installPoint.style.color = '#8B4513';
+                            showMessage(`锔钉安装完成！还需安装 ${drilledPositions.length - installCount} 个。`);
+                        }, 200);
+                        
+                        if (installCount >= drilledPositions.length) {
+                            setTimeout(() => {
+                                showMessage('所有锔钉安装完成！器物结构已加固！');
+                                document.getElementById('complete-btn').style.display = 'inline-block';
+                            }, 500);
+                        }
+                    } else {
+                        showMessage('这个锔钉已经被使用了！');
+                        installPoint.style.background = '#654321';
+                        installPoint.style.transform = 'scale(1)';
                     }
+                } else {
+                    showMessage('这个孔洞已经安装了锔钉！');
                 }
             });
             
@@ -1369,9 +1517,21 @@ function initKintsugiStep() {
         let mixingComplete = false;
         let drawing = false;
         let paintCount = 0;
-        let maxPaintCount = 150; // 金漆用量限制
+        let maxPaintCount = 300; // 增加金漆用量限制
         let goldPowderSelected = false;
         let lacquerSelected = false;
+        let currentBrushSize = 3; // 默认笔刷大小
+        
+        // 初始化笔刷控制器
+        const brushSizeSlider = document.getElementById('brush-size');
+        const brushSizeDisplay = document.getElementById('brush-size-display');
+        
+        if (brushSizeSlider && brushSizeDisplay) {
+            brushSizeSlider.addEventListener('input', (e) => {
+                currentBrushSize = parseInt(e.target.value);
+                brushSizeDisplay.textContent = currentBrushSize + 'px';
+            });
+        }
         
         // 重置状态
         ingredients.forEach(ingredient => {
@@ -1462,10 +1622,10 @@ function initKintsugiStep() {
                 ctx.beginPath();
                 ctx.moveTo(x, y);
                 ctx.strokeStyle = '#FFD700';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = currentBrushSize;
                 ctx.lineCap = 'round';
                 ctx.shadowColor = '#FFD700';
-                ctx.shadowBlur = 5;
+                ctx.shadowBlur = Math.max(2, currentBrushSize / 2);
             } else if (paintCount >= maxPaintCount) {
                 showMessage('金漆用完了！需要重新调制。');
             }
@@ -1479,7 +1639,7 @@ function initKintsugiStep() {
                 
                 ctx.lineTo(x, y);
                 ctx.stroke();
-                paintCount += 1; // 每次移动消耗1点金漆，需要更多描绘
+                paintCount += 2; // 每次移动消耗2点金漆，加快进度
                 
                 // 更新金漆剩余显示
                 const paintInfo = document.getElementById('paint-info');
@@ -1494,8 +1654,8 @@ function initKintsugiStep() {
                     }
                 }
                 
-                // 检查是否完成 - 需要更多描绘工作
-                if (paintCount >= 500) {
+                // 检查是否完成 - 降低完成要求
+                if (paintCount >= 150) {
                     showMessage('金缮描绘完成！裂痕变成了美丽的金线！');
                     document.getElementById('complete-btn').style.display = 'inline-block';
                     drawing = false;
@@ -1514,7 +1674,7 @@ function initKintsugiStep() {
                     
                     // 重置调制状态，允许重新调制
                     setTimeout(() => {
-                        if (paintCount < 500) { // 如果还没完成
+                        if (paintCount < 150) { // 如果还没完成
                             ingredients.forEach(ing => ing.classList.remove('selected'));
                             selectedIngredients = [];
                             goldPowderSelected = false;
@@ -1531,6 +1691,96 @@ function initKintsugiStep() {
         });
         
         canvas.addEventListener('mouseup', () => {
+            drawing = false;
+        });
+        
+        // 修复鼠标离开画布时停止描绘
+        canvas.addEventListener('mouseleave', (e) => {
+            if (drawing) {
+                drawing = false;
+                console.log('鼠标离开画布，停止描绘');
+                // 结束当前路径
+                ctx.stroke();
+            }
+        });
+        
+        // 鼠标重新进入画布时不自动开始绘制
+        canvas.addEventListener('mouseenter', (e) => {
+            // 不自动开始绘制，需要重新按下鼠标
+        });
+        
+        // 添加触摸事件支持
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (mixingComplete && paintCount < maxPaintCount) {
+                drawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = currentBrushSize;
+                ctx.lineCap = 'round';
+                ctx.shadowColor = '#FFD700';
+                ctx.shadowBlur = Math.max(2, currentBrushSize / 2);
+            } else if (paintCount >= maxPaintCount) {
+                showMessage('金漆用完了！需要重新调制。');
+            }
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (drawing && mixingComplete && paintCount < maxPaintCount) {
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                paintCount += 1;
+                
+                // 更新金漆剩余显示
+                const paintInfo = document.getElementById('paint-info');
+                if (paintInfo) {
+                    const remaining = maxPaintCount - paintCount;
+                    paintInfo.innerHTML = `金漆剩余：${Math.max(0, remaining)}`;
+                    
+                    if (remaining < 30) {
+                        paintInfo.style.color = '#FF6B6B';
+                        paintInfo.innerHTML += ' ⚠️';
+                    }
+                }
+                
+                // 检查完成状态
+                if (paintCount >= 150) {
+                    showMessage('金缮描绘完成！裂痕变成了美丽的金线！');
+                    document.getElementById('complete-btn').style.display = 'inline-block';
+                    drawing = false;
+                    
+                    const paintInfo = document.getElementById('paint-info');
+                    if (paintInfo) {
+                        paintInfo.remove();
+                    }
+                }
+                
+                if (paintCount >= maxPaintCount) {
+                    drawing = false;
+                    showMessage('金漆用完了！如果还没完成，需要重新调制金漆。');
+                }
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            drawing = false;
+        });
+        
+        canvas.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
             drawing = false;
         });
     }
@@ -1631,7 +1881,7 @@ function initFinishingStep() {
                 
                 polishSpot.addEventListener('mouseup', stopPolishing);
                 polishSpot.addEventListener('mouseleave', stopPolishing);
-            });
+            }); // 这里有多余的 });
             
             polishingArea.appendChild(polishSpot);
         }
@@ -1655,7 +1905,7 @@ function showFinalPresentation() {
         const stepSummary = finalPresentation.querySelector('.step-summary');
         if (stepSummary) {
             stepSummary.innerHTML = `
-                <h3 style="color: #8B4513; margin-bottom: 20px;">焗瓷修复完成总结</h3>
+                <h3 style="color: #8B4513; margin-bottom: 20px;">锯瓷修复完成总结</h3>
                 <div style="text-align: left; color: #654321; line-height: 1.6;">
                     <p><strong>第一步：</strong>捧匣与启封 - 了解器物故事，建立情感连接</p>
                     <p><strong>第二步：</strong>洗净与归位 - 清洗碎片，拼合复原</p>
@@ -1667,7 +1917,7 @@ function showFinalPresentation() {
                     <p><strong>第八步：</strong>拂尘与归还 - 抛光完成，重现光泽</p>
                 </div>
                 <p style="color: #8B4513; margin-top: 20px; font-style: italic;">
-                    通过传统焗瓷工艺，破碎的器物不仅得到修复，更获得了新的生命和美感。
+                    通过传统锯瓷工艺，破碎的器物不仅得到修复，更获得了新的生命和美感。
                     这就是中国传统手工艺的魅力所在！
                 </p>
             `;
@@ -1694,12 +1944,6 @@ function startGame() {
     document.getElementById('main-menu').classList.remove('active');
     document.getElementById('game-screen').classList.add('active');
     gameState.showStep(1);
-}
-
-function showGallery() {
-    document.getElementById('main-menu').classList.remove('active');
-    document.getElementById('gallery-screen').classList.add('active');
-    gameState.playSound('click');
 }
 
 function showTutorial() {
@@ -1796,6 +2040,119 @@ function backToMenu() {
     }
 }
 
+function restartGame() {
+    console.log('restartGame函数被调用');
+    
+    // 播放点击音效
+    if (gameState) {
+        gameState.playSound('click');
+    }
+    
+    // 显示确认对话框
+    if (confirm('确定要重新开始游戏吗？当前进度将会丢失。')) {
+        // 重置所有游戏状态
+        if (gameState) {
+            gameState.currentStep = 1;
+            gameState.stepProgress = {};
+            gameState.updateProgress();
+            gameState.updateStepTitle();
+        }
+        
+        // 隐藏所有步骤屏幕
+        document.querySelectorAll('.step-screen').forEach(step => {
+            step.classList.add('hidden');
+        });
+        
+        // 隐藏所有步骤内容区域
+        document.querySelectorAll('.step-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        
+        // 重置所有步骤介绍区域的显示状态
+        document.querySelectorAll('.step-intro').forEach(intro => {
+            intro.classList.remove('hidden');
+        });
+        
+        // 显示第一步屏幕和介绍
+        const step1 = document.getElementById('step1');
+        const step1Intro = document.getElementById('step1-intro');
+        if (step1) {
+            step1.classList.remove('hidden');
+        }
+        if (step1Intro) {
+            step1Intro.classList.remove('hidden');
+        }
+        
+        // 重置各步骤的特定状态
+        resetAllStepStates();
+        
+        // 重新初始化第一步
+        if (gameState && gameState.initStep1) {
+            gameState.initStep1();
+        }
+        
+        // 显示重新开始成功的消息
+        showMessage('游戏已重新开始！准备开始修复之旅吧！');
+    }
+}
+
+function resetAllStepStates() {
+    // 重置第一步状态
+    const boxContent = document.getElementById('box-content');
+    const storyText = document.getElementById('story-text');
+    if (boxContent) boxContent.classList.add('hidden');
+    if (storyText) storyText.classList.add('hidden');
+    
+    // 重置第二步清洗状态
+    window.brushingComplete = false;
+    window.isVesselCleaned = false;
+    window.currentTool = null;
+    
+    // 重置第三步标记状态
+    window.markCount = 0;
+    window.maxMarks = 5;
+    
+    // 重置第四步钻孔状态
+    window.drillCount = 0;
+    window.maxDrills = 5;
+    window.drillProgress = 0;
+    
+    // 重置第五步锻造状态
+    window.forgeCount = 0;
+    window.totalForges = 5;
+    
+    // 重置第六步安装状态
+    window.installCount = 0;
+    window.selectedStaple = null;
+    
+    // 重置第七步金缮状态
+    window.mixingComplete = false;
+    window.paintCount = 0;
+    window.maxPaintCount = 100;
+    window.drawing = false;
+    
+    // 重置第八步抛光状态
+    window.polishCount = 0;
+    window.maxPolish = 10;
+    
+    // 清除所有动态生成的标记点、钻孔点等
+    document.querySelectorAll('.mark-point, .drill-point, .forge-point, .install-point, .polish-spot').forEach(el => {
+        el.remove();
+    });
+    
+    // 重置所有完成按钮
+    document.querySelectorAll('#complete-btn').forEach(btn => {
+        btn.style.display = 'none';
+    });
+    
+    // 重置画布
+    const canvas = document.getElementById('painting-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
 function openLetter() {
     const storyText = document.getElementById('story-text');
     if (storyText) {
@@ -1853,8 +2210,8 @@ function playVideo(videoId) {
     // 根据视频ID设置不同的标题和描述
     const videoData = {
         'video1': {
-            title: '传统焗瓷工艺全程',
-            description: '完整展示焗瓷修复的八个步骤，从捧匣启封到最终完成，体验传统工艺的精妙之处。'
+            title: '传统锯瓷工艺全程',
+            description: '完整展示锯瓷修复的八个步骤，从捧匣启封到最终完成，体验传统工艺的精妙之处。'
         },
         'video2': {
             title: '瓷器修复技法详解',
